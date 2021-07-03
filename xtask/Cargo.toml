@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 
 [dependencies]
 anyhow = "1.0.26"
-flate2 = "1.0"
+libflate = "1.1.0"
 proc-macro2 = "1.0.8"
 quote = "1.0.2"
 ungrammar = "=1.14"

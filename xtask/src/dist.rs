@@ -2,11 +2,12 @@ use std::{
     env,
     fs::File,
     io,
+    io::Write,
     path::{Path, PathBuf},
 };
 
 use anyhow::Result;
-use flate2::{write::GzEncoder, Compression};
+use libflate::gzip::{Encoder, Decoder};
 use xshell::{cmd, mkdir_p, pushd, pushenv, read_file, rm_rf, write_file};
 
 use crate::{date_iso, flags, project_root};
@@ -115,10 +116,12 @@ fn exe_suffix(target: &str) -> String {
 }
 
 fn gzip(src_path: &Path, dest_path: &Path) -> Result<()> {
-    let mut encoder = GzEncoder::new(File::create(dest_path)?, Compression::best());
+    let mut encoder = Encoder::new(Vec::new()).unwrap();
     let mut input = io::BufReader::new(File::open(src_path)?);
     io::copy(&mut input, &mut encoder)?;
-    encoder.finish()?;
+    let mut output_file = File::create(dest_path)?;
+    let data = encoder.finish().into_result().unwrap();
+    output_file.write_all(&data).expect("Unable to write data");
     Ok(())
 }
 
